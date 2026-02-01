@@ -5,70 +5,97 @@ import { NavLink } from "react-router-dom";
 const LostAndFound = () => {
   return (
     <div>
-      <header className="bg-dark text-white text-center py-4">
-        <div id="main">
-          <img className="img1" src="https://encrypted-tbn1.gstatic.com/images?q=tbn:ANd9GcTtRJW2lSDTP66YKzeja2HmlTAszEX-Mrg3cWE6zcLAhCIFovko" alt="Description of the image" />
+
+      {/* HERO SECTION */}
+      <header className="bg-dark text-white text-center py-5">
+        <div className="container">
+          <h1 className="display-5 fw-bold">Lost & Found Portal</h1>
+          <p className="lead mt-3">
+            A centralized platform to help students report lost items and return found belongings.
+          </p>
+
+          <div className="mt-4">
+            {/* Home stays the main page */}
+            <NavLink to="/home">
+              <button className="btn btn-warning btn-lg">
+                Get Started
+              </button>
+            </NavLink>
+          </div>
         </div>
       </header>
 
-      <div className="container mt-5">
-        <div className="row">
+      {/* ABOUT SECTION */}
+      <section className="container my-5">
+        <div className="row align-items-center">
           <div className="col-md-6">
-            <h1 className="text-center mb-4">
-              Found Something? Share the Discovery on Our Found Page!
-            </h1>
-            <p>
-              Discovering lost items can be just as rewarding as finding your
-              own. If you've stumbled upon something on the CBIT campus, help us
-              reunite it with its owner by sharing a picture and details on our
-              Found Page. Your contribution could be the key to returning a
-              valuable possession to someone who's been searching for it. Join
-              our community effort in making CBIT a place where lost items find
-              their way home.
+            <h2 className="fw-bold">How it works</h2>
+            <p className="mt-3">
+              Students can submit details of lost items, post items they have found,
+              and browse available listings to recover their belongings quickly and
+              securely within the campus community.
             </p>
-            <div className="text-center">
-              <NavLink to="home">
-                <button className="btn btn-warning btn-lg">Lets start</button>
-              </NavLink>
-            </div>
           </div>
-          <div className="col-md-6">
+
+          <div className="col-md-6 text-center">
             <img
               src="https://i0.wp.com/lost-found.org/wp-content/uploads/lost-and-found-service.png?resize=768%2C458&ssl=1"
-              className="img-fluid rounded"
-              alt="pic related to lost"
+              className="img-fluid rounded shadow"
+              alt="Lost and Found illustration"
             />
           </div>
         </div>
-      </div>
+      </section>
 
-      <section className="section mt-5">
-        <div className="container" id="lost-container">
-          <img className="pic" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQojWzNS1ks64aJAJPM5GdtCTn9lwSUDzVnhtEjXBH58LIYsZE7" alt="lost icon" />
-          <h2>Lost Yours .. </h2>
-          <p>We will help You to recover the lost item. 
-            Go the page you will find the list of items which are lost recently</p>
-        </div>
+      {/* FEATURES */}
+      <section className="bg-light py-5">
+        <div className="container">
+          <div className="row text-center">
 
-        <div className="container" id="found-container">
-          <img className="pic" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcTjEjAEXCbOErx9qTfKpLzm58eJGA7269hNLaEYqPRW4Cjq1JQr" alt="found icon" />
-          <h2>Found Something then Post!!</h2>
-          <p>if u had found something in college then you can visit  our page..
-             post the the item you Found </p>
-        </div>
+            <div className="col-md-4 mb-4">
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">Report Lost Items</h5>
+                  <p className="card-text">
+                    Easily submit lost item details and check recent found items.
+                  </p>
+                </div>
+              </div>
+            </div>
 
-        <div className="container" id="lost-container">
-          <img className="pic" src="https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcR2r8neY8N3pY_fEi2d6MOIfSufsuRYePtifVIHY6VYUd2XHeUM" alt="find icon" />
-          <h2>Search..?</h2>
-          <p>If You lost something..
-            You can visit our website and find for your lost items 
-          </p>
+            <div className="col-md-4 mb-4">
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">Post Found Items</h5>
+                  <p className="card-text">
+                    Found something on campus? Post it to help return it to its owner.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4 mb-4">
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <h5 className="card-title">Search & Recover</h5>
+                  <p className="card-text">
+                    Browse listings and quickly match lost items with found ones.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
+      {/* FOOTER */}
       <footer className="bg-dark text-white text-center py-3">
-        <p>&copy; 2023 Lost and Found. All rights reserved.</p>
+        <p className="mb-0">
+          © {new Date().getFullYear()} Lost & Found System | College Project
+        </p>
       </footer>
+
     </div>
   );
 };

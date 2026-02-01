@@ -1,3 +1,5 @@
+require("dotenv").config({ path: "./server/.env" });
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -7,7 +9,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔑 MongoDB Atlas connection
+// MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Atlas connected"))
@@ -24,12 +26,11 @@ app.post("/lostitems", (req, res) => {
 app.get("/getlostitems", async (req, res) => {
   try {
     const items = await Registration.find();
-    res.status(200).json(items); // will be [] if no data
+    res.status(200).json(items);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // Start server
 app.listen(3001, () => {

@@ -3,7 +3,8 @@
 ### To run the application 
 1.clone the repo
 ```bash
-git clone https://github.com/AnveshNalimela/lostandfound.git
+git https://github.com/dhiyanesh11/lost-and-found.git
+
 ```
 2.Open in the terminal
 3. Run the Server

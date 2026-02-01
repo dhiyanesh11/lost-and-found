@@ -3,3 +3,4 @@ client/node_modules/
 client/node_modules/.cache/
 server/node_modules/
 server/.env
+.env
