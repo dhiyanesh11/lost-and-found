@@ -1,4 +1,4 @@
-require("dotenv").config({ path: "./server/.env" });
+require("dotenv").config();   // MUST be at the top
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -11,28 +11,29 @@ app.use(express.json());
 
 // MongoDB connection
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect("mongodb://127.0.0.1:27017/lostandfound")
   .then(() => console.log("MongoDB Atlas connected"))
   .catch((err) => console.error("MongoDB connection error:", err));
 
-// POST lost item
-app.post("/lostitems", (req, res) => {
-  Registration.create(req.body)
-    .then((result) => res.json(result))
-    .catch((err) => res.status(500).json(err));
-});
-
-// GET lost items
-app.get("/getlostitems", async (req, res) => {
+// routes
+app.post("/lostitems", async (req, res) => {
   try {
-    const items = await Registration.find();
-    res.status(200).json(items);
+    const item = await Registration.create(req.body);
+    res.json(item);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json(err);
   }
 });
 
-// Start server
+app.get("/getlostitems", async (req, res) => {
+  try {
+    const items = await Registration.find();
+    res.json(items);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 app.listen(3001, () => {
   console.log("Server is running on port 3001");
 });
