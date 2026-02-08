@@ -4,3 +4,4 @@ client/node_modules/.cache/
 server/node_modules/
 server/.env
 .env
+gomma
