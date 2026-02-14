@@ -4,98 +4,110 @@ import { NavLink } from "react-router-dom";
 
 const LostAndFound = () => {
   return (
-    <div>
-
+    <div style={{ fontFamily: "Inter, sans-serif" }}>
+      
       {/* HERO SECTION */}
-      <header className="bg-dark text-white text-center py-5">
-        <div className="container">
-          <h1 className="display-5 fw-bold">Lost & Found Portal</h1>
-          <p className="lead mt-3">
-            A centralized platform to help students report lost items and return found belongings.
+      <section
+        className="text-white d-flex align-items-center"
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #1e3c72, #2a5298)",
+          padding: "80px 0",
+        }}
+      >
+        <div className="container text-center">
+          <h1 className="display-4 fw-bold mb-4">
+            Intelligent Lost & Found System
+          </h1>
+          <p className="lead mb-5" style={{ maxWidth: "700px", margin: "0 auto" }}>
+            A smart digital platform to manage lost and found items efficiently. 
+            Post, search, and reconnect items with their rightful owners.
           </p>
 
-          <div className="mt-4">
-            {/* Home stays the main page */}
-            <NavLink to="/home">
-              <button className="btn btn-warning btn-lg">
-                Get Started
-              </button>
-            </NavLink>
-          </div>
+          <NavLink to="/home">
+            <button className="btn btn-light btn-lg px-4 py-2 fw-semibold shadow">
+              Get Started
+            </button>
+          </NavLink>
         </div>
-      </header>
+      </section>
 
-      {/* ABOUT SECTION */}
-      <section className="container my-5">
-        <div className="row align-items-center">
-          <div className="col-md-6">
-            <h2 className="fw-bold">How it works</h2>
-            <p className="mt-3">
-              Students can submit details of lost items, post items they have found,
-              and browse available listings to recover their belongings quickly and
-              securely within the campus community.
-            </p>
-          </div>
+      {/* FEATURES SECTION */}
+      <section className="py-5 bg-light">
+        <div className="container text-center">
+          <h2 className="fw-bold mb-5">Key Features</h2>
 
-          <div className="col-md-6 text-center">
-            <img
-              src="https://i0.wp.com/lost-found.org/wp-content/uploads/lost-and-found-service.png?resize=768%2C458&ssl=1"
-              className="img-fluid rounded shadow"
-              alt="Lost and Found illustration"
-            />
+          <div className="row g-4">
+            <div className="col-md-4">
+              <div
+                className="p-4 bg-white rounded-4 shadow-sm h-100"
+                style={{ transition: "0.3s" }}
+              >
+                <h5 className="fw-bold mb-3">Post Found Items</h5>
+                <p className="text-muted">
+                  Quickly submit details of found items and help others recover
+                  their belongings.
+                </p>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div
+                className="p-4 bg-white rounded-4 shadow-sm h-100"
+                style={{ transition: "0.3s" }}
+              >
+                <h5 className="fw-bold mb-3">Search & Retrieve</h5>
+                <p className="text-muted">
+                  Browse and search through lost items using structured data
+                  retrieval.
+                </p>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div
+                className="p-4 bg-white rounded-4 shadow-sm h-100"
+                style={{ transition: "0.3s" }}
+              >
+                <h5 className="fw-bold mb-3">AI-Based Matching (Upcoming)</h5>
+                <p className="text-muted">
+                  Future integration of AI to automatically suggest potential
+                  matches between lost and found items.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FEATURES */}
-      <section className="bg-light py-5">
+      {/* CTA SECTION */}
+      <section
+        className="py-5 text-center text-white"
+        style={{
+          background: "linear-gradient(135deg, #2a5298, #1e3c72)",
+        }}
+      >
         <div className="container">
-          <div className="row text-center">
+          <h3 className="fw-bold mb-3">
+            Help reconnect lost items today
+          </h3>
+          <p className="mb-4">
+            Join our digital initiative to make lost item recovery faster,
+            smarter, and more efficient.
+          </p>
 
-            <div className="col-md-4 mb-4">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                  <h5 className="card-title">Report Lost Items</h5>
-                  <p className="card-text">
-                    Easily submit lost item details and check recent found items.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-4 mb-4">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                  <h5 className="card-title">Post Found Items</h5>
-                  <p className="card-text">
-                    Found something on campus? Post it to help return it to its owner.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-4 mb-4">
-              <div className="card h-100 shadow-sm">
-                <div className="card-body">
-                  <h5 className="card-title">Search & Recover</h5>
-                  <p className="card-text">
-                    Browse listings and quickly match lost items with found ones.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-          </div>
+          <NavLink to="/home">
+            <button className="btn btn-outline-light btn-lg px-4">
+              Explore Now
+            </button>
+          </NavLink>
         </div>
       </section>
 
       {/* FOOTER */}
       <footer className="bg-dark text-white text-center py-3">
-        <p className="mb-0">
-          © {new Date().getFullYear()} Lost & Found System | College Project
-        </p>
+        <small>© 2025 Intelligent Lost & Found System. All Rights Reserved.</small>
       </footer>
-
     </div>
   );
 };
