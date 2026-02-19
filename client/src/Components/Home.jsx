@@ -16,6 +16,7 @@ function Home() {
     message: "",
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
   const [data, setData] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -32,39 +33,60 @@ function Home() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    axios.post(
-      "http://localhost:3001/lostitems",
-      form,
-      {
-        headers: {
-          Authorization: localStorage.getItem("token"),
-        },
-      }
-    )
-      .then(() => {
-        setSuccess(true);
-        setShowModal(false);
-        getData();
-        setForm({
-          name: "",
-          place: "",
-          description: "",
-          date: "",
-          yourname: "",
-          contact: "",
-          message: "",
-        });
-      })
-      .catch(err => console.log(err));
+    try {
+      const token = localStorage.getItem("token");
+
+      const formData = new FormData();
+      formData.append("name", form.name);
+      formData.append("place", form.place);
+      formData.append("description", form.description);
+      formData.append("date", form.date);
+      formData.append("yourname", form.yourname);
+      formData.append("contact", form.contact);
+      formData.append("message", form.message);
+      formData.append("image", selectedFile);
+
+      await axios.post(
+        "http://localhost:3001/lostitems",
+        formData,
+        {
+          headers: {
+            Authorization: token,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      setSuccess(true);
+      setShowModal(false);
+      getData();
+
+      setForm({
+        name: "",
+        place: "",
+        description: "",
+        date: "",
+        yourname: "",
+        contact: "",
+        message: "",
+      });
+
+      setSelectedFile(null);
+
+    } catch (err) {
+      console.log(err);
+      alert("Upload failed");
+    }
   };
 
   const getData = () => {
-    axios.get("http://localhost:3001/getlostitems")
-      .then(res => setData(res.data))
-      .catch(err => console.log(err));
+    axios
+      .get("http://localhost:3001/getlostitems")
+      .then((res) => setData(res.data))
+      .catch((err) => console.log(err));
   };
 
   const handleLogout = () => {
@@ -103,7 +125,7 @@ function Home() {
           className="btn btn-dark btn-lg me-3 px-4"
           onClick={() => setShowModal(true)}
         >
-          + Post Found Item
+          + Post Lost Item
         </button>
 
         <button
@@ -144,7 +166,7 @@ function Home() {
             style={{ width: "400px" }}
           >
             <h5 className="mb-3 text-center fw-bold">
-              Post Found Item
+              Post Lost Item
             </h5>
 
             <form onSubmit={handleSubmit}>
@@ -166,11 +188,35 @@ function Home() {
               <input
                 type="date"
                 name="date"
-                className="form-control mb-3"
+                className="form-control mb-2"
                 value={form.date}
                 onChange={handleChange}
                 required
               />
+
+              {/* IMAGE INPUT */}
+              <input
+                type="file"
+                accept="image/*"
+                className="form-control mb-2"
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+                required
+              />
+
+              {/* IMAGE PREVIEW */}
+              {selectedFile && (
+                <img
+                  src={URL.createObjectURL(selectedFile)}
+                  alt="Preview"
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "10px"
+                  }}
+                />
+              )}
 
               <button
                 type="submit"
@@ -196,24 +242,29 @@ function Home() {
         <div className="row g-4">
           {data.map((item, index) => (
             <div className="col-md-4" key={index}>
-              <div
-                className="p-4 rounded-4 shadow-sm bg-light h-100"
-              >
+              <div className="p-4 rounded-4 shadow-sm bg-light h-100">
+
+                {item.imageUrl && (
+                  <img
+                    src={item.imageUrl}
+                    alt="Lost Item"
+                    style={{
+                      width: "100%",
+                      height: "200px",
+                      objectFit: "cover",
+                      borderRadius: "8px",
+                      marginBottom: "10px"
+                    }}
+                  />
+                )}
+
                 <h5 className="fw-bold">{item.name}</h5>
-                <p className="text-muted mb-1">
-                  📍 {item.place}
-                </p>
+                <p className="text-muted mb-1">📍 {item.place}</p>
                 <p className="small">{item.description}</p>
                 <hr />
-                <p className="small mb-1">
-                  🗓 {item.date}
-                </p>
-                <p className="small mb-1">
-                  👤 {item.yourname}
-                </p>
-                <p className="small">
-                  📞 {item.contact}
-                </p>
+                <p className="small mb-1">🗓 {item.date}</p>
+                <p className="small mb-1">👤 {item.yourname}</p>
+                <p className="small">📞 {item.contact}</p>
               </div>
             </div>
           ))}
