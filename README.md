@@ -20,3 +20,22 @@ cd client
 npm install
 npm run dev
 ```
+
+
+## Features
+- Student & Admin roles
+- JWT Authentication
+- AWS S3 image storage
+- Found item claim workflow
+- Admin claim approval system
+
+## Tech Stack
+- React
+- Node.js
+- Express
+- MongoDB
+- AWS S3
+
+## Setup
+1. cd server → npm install → npm start
+2. cd client → npm install → npm start
