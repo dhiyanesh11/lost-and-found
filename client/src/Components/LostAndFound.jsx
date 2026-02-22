@@ -29,6 +29,8 @@ const LostAndFound = () => {
               Get Started
             </button>
           </NavLink>
+          
+          
         </div>
       </section>
 

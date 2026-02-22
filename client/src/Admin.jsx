@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Home() {
+function Admin() {
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -13,16 +13,14 @@ function Home() {
   });
 
   const [selectedFile, setSelectedFile] = useState(null);
-  const [data, setData] = useState([]);
+  const [lostItems, setLostItems] = useState([]);
+  const [claims, setClaims] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Redirect if no token
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    }
+    if (!token) navigate("/login");
   }, [navigate]);
 
   const handleLogout = () => {
@@ -34,13 +32,11 @@ function Home() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // 🔥 POST LOST ITEM
+  // POST FOUND ITEM
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      const token = localStorage.getItem("token");
-
       const formData = new FormData();
       formData.append("name", form.name);
       formData.append("place", form.place);
@@ -48,25 +44,18 @@ function Home() {
       formData.append("image", selectedFile);
 
       await axios.post(
-        "http://localhost:3001/lostitems",
+        "http://localhost:3001/founditems",
         formData,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
 
       setSuccess(true);
       setShowModal(false);
-      getData();
-
-      setForm({
-        name: "",
-        place: "",
-        description: "",
-      });
-
+      setForm({ name: "", place: "", description: "" });
       setSelectedFile(null);
 
     } catch (err) {
@@ -75,20 +64,36 @@ function Home() {
     }
   };
 
-  // 🔥 GET FOUND ITEMS (Student Views)
-  const getData = () => {
+  const fetchLostItems = () => {
     axios
-      .get("http://localhost:3001/founditems", {
+      .get("http://localhost:3001/lostitems", {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       })
-      .then((res) => {
-        setData(res.data);
+      .then((res) => setLostItems(res.data));
+  };
+
+  const fetchClaims = () => {
+    axios
+      .get("http://localhost:3001/claims", {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       })
-      .catch((err) => {
-        console.log(err.response?.data || err.message);
-      });
+      .then((res) => setClaims(res.data));
+  };
+
+  const updateClaim = (id, status) => {
+    axios.patch(
+      `http://localhost:3001/claims/${id}`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    ).then(() => fetchClaims());
   };
 
   return (
@@ -101,9 +106,9 @@ function Home() {
         }}
       >
         <div className="container">
-          <h2 className="fw-bold mb-2">Student Dashboard</h2>
+          <h2 className="fw-bold mb-2">Admin Dashboard</h2>
           <p className="opacity-75">
-            Manage and track your lost items
+            Manage found items and recovery claims
           </p>
 
           <button
@@ -121,21 +126,28 @@ function Home() {
           className="btn btn-dark btn-lg me-3 px-4"
           onClick={() => setShowModal(true)}
         >
-          + Post Lost Item
+          + Post Found Item
+        </button>
+
+        <button
+          className="btn btn-outline-dark btn-lg me-3 px-4"
+          onClick={fetchLostItems}
+        >
+          View Lost Items
         </button>
 
         <button
           className="btn btn-outline-dark btn-lg px-4"
-          onClick={getData}
+          onClick={fetchClaims}
         >
-          View Found Items
+          View Claims
         </button>
       </div>
 
       {success && (
         <div className="container">
           <div className="alert alert-success text-center">
-            Lost item posted successfully!
+            Found item posted successfully!
           </div>
         </div>
       )}
@@ -162,7 +174,7 @@ function Home() {
             style={{ width: "400px" }}
           >
             <h5 className="mb-3 text-center fw-bold">
-              Post Lost Item
+              Post Found Item
             </h5>
 
             <form onSubmit={handleSubmit}>
@@ -179,7 +191,7 @@ function Home() {
               <input
                 type="text"
                 name="place"
-                placeholder="Location Lost"
+                placeholder="Location Found"
                 className="form-control mb-2"
                 value={form.place}
                 onChange={handleChange}
@@ -195,16 +207,13 @@ function Home() {
                 required
               />
 
-              {/* IMAGE INPUT */}
               <input
                 type="file"
-                accept="image/*"
                 className="form-control mb-2"
                 onChange={(e) => setSelectedFile(e.target.files[0])}
                 required
               />
 
-              {/* IMAGE PREVIEW */}
               {selectedFile && (
                 <img
                   src={URL.createObjectURL(selectedFile)}
@@ -238,17 +247,16 @@ function Home() {
         </div>
       )}
 
-      {/* FOUND ITEM CARDS */}
+      {/* LOST ITEMS DISPLAY */}
       <div className="container mb-5">
         <div className="row g-4">
-          {data.map((item, index) => (
-            <div className="col-md-4" key={index}>
+          {lostItems.map((item) => (
+            <div className="col-md-4" key={item._id}>
               <div className="p-4 rounded-4 shadow-sm bg-light h-100 hover-card">
-
                 {item.imageUrl && (
                   <img
                     src={item.imageUrl}
-                    alt="Found Item"
+                    alt="Lost Item"
                     style={{
                       width: "100%",
                       height: "200px",
@@ -260,8 +268,60 @@ function Home() {
                 )}
 
                 <h5 className="fw-bold">{item.title}</h5>
-                <p className="text-muted mb-1">📍 {item.location}</p>
+
+                <p className="text-muted mb-1">
+                  📍 {item.location}
+                </p>
+
                 <p className="small">{item.description}</p>
+
+                <hr />
+
+                <p className="small mb-1">
+                  👤 {item.studentId?.name}
+                </p>
+
+                <p className="small">
+                  🆔 {item.studentId?.registerNo}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* CLAIMS DISPLAY */}
+      <div className="container mb-5">
+        <div className="row g-4">
+          {claims.map((claim) => (
+            <div className="col-md-4" key={claim._id}>
+              <div className="p-4 rounded-4 shadow-sm bg-light h-100">
+                <h6 className="fw-bold">
+                  Found Item: {claim.foundItemId?.title}
+                </h6>
+                <p className="small">
+                  👤 {claim.studentId?.name}
+                </p>
+                <p className="small">
+                  Status: {claim.status}
+                </p>
+
+                {claim.status === "pending" && (
+                  <>
+                    <button
+                      className="btn btn-success btn-sm me-2"
+                      onClick={() => updateClaim(claim._id, "approved")}
+                    >
+                      Approve
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => updateClaim(claim._id, "rejected")}
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -272,4 +332,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Admin;

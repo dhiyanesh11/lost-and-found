@@ -9,10 +9,14 @@ const multer = require("multer");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 
-const s3 = require("./config/s3");
-const User = require("./models/User");
-const Registration = require("./models/registrations");
+const authorize = require("./middleware/authorize");
 const auth = require("./middleware/auth");
+const s3 = require("./config/s3");
+const Claim = require("./models/Claim");
+const User = require("./models/User");
+const LostItem = require("./models/LostItem");
+const FoundItem = require("./models/FoundItem");
+
 
 const app = express();
 
@@ -53,13 +57,14 @@ app.post("/signup", async (req, res) => {
       name,
       registerNo,
       password: hashedPassword,
+      role: "student", // default
     });
 
     res.json({ message: "User registered successfully" });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Signup failed" });
+    console.error("Signup error:", err);
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -79,7 +84,11 @@ app.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, registerNo: user.registerNo },
+      {
+        id: user._id,
+        registerNo: user.registerNo,
+        role: user.role,   // 🔥 role included
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" }
     );
@@ -93,64 +102,231 @@ app.post("/login", async (req, res) => {
 });
 
 /* ========================
-   LOST ITEMS ROUTES
+   LOST ITEMS (STUDENT)
 ======================== */
 
-// PROTECTED POST WITH IMAGE UPLOAD
-app.post("/lostitems", auth, upload.single("image"), async (req, res) => {
-  try {
-    const file = req.file;
+// Student posts lost item
+app.post(
+  "/lostitems",
+  auth,
+  authorize(["student"]),
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ error: "Image required" });
+      }
 
-    if (!file) {
-      return res.status(400).json({ error: "Image required" });
+      const fileName = `${uuidv4()}-${file.originalname}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: fileName,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        })
+      );
+
+      const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+      const newItem = await LostItem.create({
+        title: req.body.name,
+        description: req.body.description,
+        location: req.body.place,
+        imageUrl,
+        studentId: req.user.id,
+      });
+
+      res.json(newItem);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Upload failed" });
+    }
+  }
+);
+
+app.post("/claims", auth, authorize(["student"]), async (req, res) => {
+  try {
+    const { foundItemId } = req.body;
+
+    const existing = await Claim.findOne({
+      foundItemId,
+      studentId: req.user.id,
+    });
+
+    if (existing) {
+      return res.status(400).json({ message: "Already claimed" });
     }
 
-    const fileName = `${uuidv4()}-${file.originalname}`;
+    const claim = await Claim.create({
+      foundItemId,
+      studentId: req.user.id,
+    });
 
-    const uploadParams = {
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: fileName,
-      Body: file.buffer,
-      ContentType: file.mimetype,
-    };
-
-    await s3.send(new PutObjectCommand(uploadParams));
-
-    const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
-
-    const newItem = await Registration.create({
-  name: req.body.name,
-  place: req.body.place,
-  description: req.body.description,
-  date: req.body.date,
-  yourname: req.body.yourname,
-  contact: req.body.contact,
-  message: req.body.message,
-  imageUrl: imageUrl,
-  userId: req.user.id,
-});
-    res.json(newItem);
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Upload failed" });
+    res.json(claim);
+  } catch (err) {
+    res.status(500).json({ error: "Claim failed" });
   }
 });
-
-// GET ALL LOST ITEMS
-app.get("/getlostitems", async (req, res) => {
+// Admin can view all lost items
+app.get("/lostitems", auth, authorize(["admin"]), async (req, res) => {
   try {
-    const items = await Registration.find().sort({ createdAt: -1 });
+    const items = await LostItem.find()
+      .populate("studentId", "name registerNo")
+      .sort({ createdAt: -1 });
+
     res.json(items);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to fetch items" });
+    res.status(500).json({ error: "Failed to fetch lost items" });
   }
 });
 
 /* ========================
-   SERVER
+   FOUND ITEMS (ADMIN)
 ======================== */
+
+// Admin posts found item
+app.post(
+  "/founditems",
+  auth,
+  authorize(["admin"]),
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ error: "Image required" });
+      }
+
+      const fileName = `${uuidv4()}-${file.originalname}`;
+
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: fileName,
+          Body: file.buffer,
+          ContentType: file.mimetype,
+        })
+      );
+
+      const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
+
+      const newItem = await FoundItem.create({
+        title: req.body.name,
+        description: req.body.description,
+        location: req.body.place,
+        imageUrl,
+        postedBy: req.user.id,
+      });
+
+      res.json(newItem);
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Upload failed" });
+    }
+  }
+);
+
+app.patch("/claims/:id", auth, authorize(["admin"]), async (req, res) => {
+  try {
+    const { status, adminNote } = req.body;
+
+    const claim = await Claim.findByIdAndUpdate(
+      req.params.id,
+      { status, adminNote },
+      { new: true }
+    );
+
+    if (status === "approved") {
+      await FoundItem.findByIdAndUpdate(claim.foundItemId, {
+        status: "closed",
+      });
+    }
+
+    res.json(claim);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update claim" });
+  }
+});
+// Students can view found items
+app.get("/founditems", auth, async (req, res) => {
+  try {
+    const items = await FoundItem.find({ status: "available" })
+      .sort({ createdAt: -1 });
+
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch found items" });
+  }
+});
+app.get("/claims", auth, authorize(["admin"]), async (req, res) => {
+  try {
+    const claims = await Claim.find()
+      .populate("studentId")
+      .populate("foundItemId");
+
+    res.json(claims);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch claims" });
+  }
+});
+
+// Student raises complaint
+app.post("/complaints", auth, authorize(["student"]), async (req, res) => {
+  try {
+    const complaint = await Complaint.create({
+      lostItemId: req.body.lostItemId,
+      studentId: req.user.id,
+      message: req.body.message,
+    });
+
+    res.json(complaint);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create complaint" });
+  }
+});
+
+// Admin views complaints
+app.get("/complaints", auth, authorize(["admin"]), async (req, res) => {
+  try {
+    const complaints = await Complaint.find()
+      .populate("lostItemId")
+      .populate("studentId");
+
+    res.json(complaints);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch complaints" });
+  }
+});
+
+// Admin replies to complaint
+app.patch(
+  "/complaints/:id",
+  auth,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const updated = await Complaint.findByIdAndUpdate(
+        req.params.id,
+        {
+          adminReply: req.body.adminReply,
+          status: "resolved",
+        },
+        { new: true }
+      );
+
+      res.json(updated);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to reply" });
+    }
+  }
+);
+
+
 app.listen(3001, () => {
   console.log("Server running on port 3001");
 });

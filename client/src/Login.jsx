@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
 function Login() {
   const navigate = useNavigate();
@@ -18,9 +19,20 @@ function Login() {
     e.preventDefault();
 
     axios.post("http://localhost:3001/login", form)
+
+
       .then((res) => {
-        localStorage.setItem("token", res.data.token);
-        navigate("/home");
+        const token = res.data.token;
+        localStorage.setItem("token", token);
+
+        const decoded = jwtDecode(token);
+
+        if (decoded.role === "admin") {
+          navigate("/admin");
+        } else {
+          navigate("/home");
+        }
+        
       })
       .catch((err) => {
         alert(err.response?.data?.message || "Login failed");
