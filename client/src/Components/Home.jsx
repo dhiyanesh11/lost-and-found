@@ -74,6 +74,25 @@ function Home() {
       alert("Upload failed");
     }
   };
+  const handleClaim = async (id) => {
+  try {
+    const token = localStorage.getItem("token");
+
+    await axios.post(
+      "http://localhost:3001/claims",
+      { foundItemId: id },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    alert("Claim submitted!");
+  } catch (err) {
+    alert(err.response?.data?.message || "Claim failed");
+  }
+};
 
   // 🔥 GET FOUND ITEMS (Student Views)
   const getData = () => {
@@ -244,6 +263,14 @@ function Home() {
           {data.map((item, index) => (
             <div className="col-md-4" key={index}>
               <div className="p-4 rounded-4 shadow-sm bg-light h-100 hover-card">
+                {item.status === "available" && (
+                  <button
+                    className="btn btn-success w-100 mt-2"
+                    onClick={() => handleClaim(item._id)}
+                  >
+                    Claim This Item
+                  </button>
+                )}
 
                 {item.imageUrl && (
                   <img

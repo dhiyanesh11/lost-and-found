@@ -152,6 +152,24 @@ app.post("/claims", auth, authorize(["student"]), async (req, res) => {
   try {
     const { foundItemId } = req.body;
 
+    // 1️⃣ Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(foundItemId)) {
+      return res.status(400).json({ message: "Invalid item ID" });
+    }
+
+    // 2️⃣ Check if item exists
+    const foundItem = await FoundItem.findById(foundItemId);
+
+    if (!foundItem) {
+      return res.status(404).json({ message: "Item not found" });
+    }
+
+    // 3️⃣ Check availability
+    if (foundItem.status !== "available") {
+      return res.status(400).json({ message: "Item is not available" });
+    }
+
+    // 4️⃣ Prevent duplicate claim
     const existing = await Claim.findOne({
       foundItemId,
       studentId: req.user.id,
@@ -161,16 +179,20 @@ app.post("/claims", auth, authorize(["student"]), async (req, res) => {
       return res.status(400).json({ message: "Already claimed" });
     }
 
+    // 5️⃣ Create claim
     const claim = await Claim.create({
       foundItemId,
       studentId: req.user.id,
     });
 
-    res.json(claim);
+    res.status(201).json(claim);
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Claim failed" });
   }
 });
+
 // Admin can view all lost items
 app.get("/lostitems", auth, authorize(["admin"]), async (req, res) => {
   try {
@@ -235,21 +257,52 @@ app.patch("/claims/:id", auth, authorize(["admin"]), async (req, res) => {
   try {
     const { status, adminNote } = req.body;
 
-    const claim = await Claim.findByIdAndUpdate(
-      req.params.id,
-      { status, adminNote },
-      { new: true }
-    );
+    const claim = await Claim.findById(req.params.id);
+
+    if (!claim) {
+      return res.status(404).json({ message: "Claim not found" });
+    }
+
+    if (claim.status !== "pending") {
+      return res.status(400).json({ message: "Claim already processed" });
+    }
+
+    const foundItem = await FoundItem.findById(claim.foundItemId);
+
+    if (foundItem.status === "closed") {
+      return res.status(400).json({ message: "Item already closed" });
+    }
+
+    claim.status = status;
+    claim.adminNote = adminNote || "";
+    claim.reviewedBy = req.user.id;
+    claim.reviewedAt = new Date();
+
+    await claim.save();
 
     if (status === "approved") {
-      await FoundItem.findByIdAndUpdate(claim.foundItemId, {
-        status: "closed",
-      });
+      foundItem.status = "closed";
+      await foundItem.save();
+
+      // Reject other pending claims
+      await Claim.updateMany(
+        {
+          foundItemId: claim.foundItemId,
+          status: "pending",
+          _id: { $ne: claim._id }
+        },
+        {
+          status: "rejected",
+          adminNote: "Another claim approved"
+        }
+      );
     }
 
     res.json(claim);
+
   } catch (err) {
-    res.status(500).json({ error: "Failed to update claim" });
+    console.error(err);
+    res.status(500).json({ error: "Update failed" });
   }
 });
 // Students can view found items

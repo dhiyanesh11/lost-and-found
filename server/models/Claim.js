@@ -21,6 +21,11 @@ const claimSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    reviewedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+},
+reviewedAt: Date
   },
   { timestamps: true }
 );
