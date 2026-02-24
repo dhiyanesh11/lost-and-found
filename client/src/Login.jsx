@@ -28,10 +28,10 @@ function Login() {
         const decoded = jwtDecode(token);
 
         if (decoded.role === "admin") {
-          navigate("/admin");
-        } else {
-          navigate("/home");
-        }
+  navigate("/admin/dashboard");
+} else {
+  navigate("/student/dashboard");
+}
         
       })
       .catch((err) => {

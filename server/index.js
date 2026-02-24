@@ -237,12 +237,12 @@ app.post(
       const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 
       const newItem = await FoundItem.create({
-        title: req.body.name,
-        description: req.body.description,
-        location: req.body.place,
-        imageUrl,
-        postedBy: req.user.id,
-      });
+  title: req.body.title,
+  description: req.body.description,
+  location: req.body.location,
+  imageUrl,
+  postedBy: req.user.id,
+});
 
       res.json(newItem);
 
@@ -303,6 +303,47 @@ app.patch("/claims/:id", auth, authorize(["admin"]), async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Update failed" });
+  }
+});
+app.get("/claims/me", auth, authorize(["student"]), async (req, res) => {
+  try {
+    const claims = await Claim.find({ studentId: req.user.id })
+      .populate("foundItemId")
+      .sort({ createdAt: -1 });
+
+    res.json(claims);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch claims" });
+  }
+});
+app.get("/claims/me", auth, authorize(["student"]), async (req, res) => {
+  const claims = await Claim.find({ studentId: req.user.id })
+    .populate("foundItemId");
+
+  res.json(claims);
+});
+app.delete("/claims/:id", auth, authorize(["student"]), async (req, res) => {
+  try {
+    const claim = await Claim.findById(req.params.id);
+
+    if (!claim) {
+      return res.status(404).json({ message: "Claim not found" });
+    }
+
+    if (claim.studentId.toString() !== req.user.id) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+
+    if (claim.status !== "pending") {
+      return res.status(400).json({ message: "Cannot cancel processed claim" });
+    }
+
+    await claim.deleteOne();
+
+    res.json({ message: "Claim cancelled" });
+
+  } catch (err) {
+    res.status(500).json({ message: "Cancel failed" });
   }
 });
 // Students can view found items

@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 const LostAndFound = () => {
   return (
     <div style={{ fontFamily: "Inter, sans-serif" }}>
-      
+
       {/* HERO SECTION */}
       <section
         className="text-white d-flex align-items-center"
@@ -19,14 +19,23 @@ const LostAndFound = () => {
           <h1 className="display-4 fw-bold mb-4">
             Intelligent Lost & Found System
           </h1>
-          <p className="lead mb-5" style={{ maxWidth: "700px", margin: "0 auto" }}>
-            A smart digital platform to manage lost and found items efficiently. 
+
+          <p
+            className="lead mb-5"
+            style={{ maxWidth: "700px", margin: "0 auto" }}
+          >
+            A smart digital platform to manage lost and found items efficiently.
             Post, search, and reconnect items with their rightful owners.
           </p>
 
-          
-          
-          
+          {/* BUTTONS */}
+          <div className="d-flex justify-content-center gap-3">
+            <NavLink to="/login">
+              <button className="btn btn-light btn-lg px-4">
+                Get Started
+              </button>
+            </NavLink>
+          </div>
         </div>
       </section>
 

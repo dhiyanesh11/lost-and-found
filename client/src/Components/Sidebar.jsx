@@ -1,33 +1,51 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 function Sidebar({ role }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleNavigate = (path) => {
-    navigate(path);
-    setIsOpen(false); // auto close on mobile
-  };
-
   const handleLogout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
 
+  const linkClass = ({ isActive }) =>
+    isActive ? "sidebar-link active" : "sidebar-link";
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        isOpen &&
+        !e.target.closest(".sidebar") &&
+        !e.target.closest(".hamburger-container")
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, [isOpen]);
+
   return (
     <>
-      {/* MOBILE HAMBURGER */}
-      <div className="d-md-none p-3">
+      {/* MOBILE HAMBURGER (Always Visible) */}
+      <div className="hamburger-container d-md-none">
         <button
-          className="btn btn-dark"
+          className="hamburger-btn"
           onClick={() => setIsOpen(!isOpen)}
         >
-          ☰
+          {isOpen ? "✖" : "☰"}
         </button>
       </div>
 
+      {/* OVERLAY */}
+      {isOpen && <div className="sidebar-overlay"></div>}
+
+      {/* SIDEBAR */}
       <div className={`sidebar ${isOpen ? "active" : ""}`}>
         <h4 className="sidebar-title">
           {role === "admin" ? "Admin Panel" : "Student Panel"}
@@ -35,26 +53,35 @@ function Sidebar({ role }) {
 
         {role === "student" && (
           <>
-            <button onClick={() => handleNavigate("/home")}>
+            <NavLink to="/student/dashboard" className={linkClass}>
               Dashboard
-            </button>
-            <button onClick={() => handleNavigate("/student/post-lost")}>
+            </NavLink>
+            <NavLink to="/student/post-lost" className={linkClass}>
               Post Lost Item
-            </button>
-            <button onClick={() => handleNavigate("/student/found-items")}>
+            </NavLink>
+            <NavLink to="/student/found-items" className={linkClass}>
               View Found Items
-            </button>
+            </NavLink>
+            <NavLink to="/student/my-claims" className={linkClass}>
+              My Claims
+            </NavLink>
           </>
         )}
 
         {role === "admin" && (
           <>
-            <button onClick={() => handleNavigate("/admin")}>
+            <NavLink to="/admin/dashboard" className={linkClass}>
               Dashboard
-            </button>
-            <button onClick={() => handleNavigate("/admin/claims")}>
+            </NavLink>
+            <NavLink to="/admin/post-found" className={linkClass}>
+              Post Found Item
+            </NavLink>
+            <NavLink to="/admin/lost-items" className={linkClass}>
+              View Lost Items
+            </NavLink>
+            <NavLink to="/admin/claims" className={linkClass}>
               View Claims
-            </button>
+            </NavLink>
           </>
         )}
 
