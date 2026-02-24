@@ -9,6 +9,8 @@
   color: white;
   display: flex;
   flex-direction: column;
+  transition: transform 0.3s ease-in-out;
+  z-index: 2000;
 }
 
 .sidebar-title {
@@ -36,4 +38,15 @@
 .logout-btn {
   margin-top: auto;
   background: #dc3545 !important;
+}
+
+/* MOBILE STYLES */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
 }

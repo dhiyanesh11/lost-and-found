@@ -1,50 +1,68 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 
 function Sidebar({ role }) {
   const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    setIsOpen(false); // auto close on mobile
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    navigate("/login");
   };
 
   return (
-    <div className="sidebar">
-      <h4 className="sidebar-title">
-        {role === "admin" ? "Admin Panel" : "Student Panel"}
-      </h4>
+    <>
+      {/* MOBILE HAMBURGER */}
+      <div className="d-md-none p-3">
+        <button
+          className="btn btn-dark"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          ☰
+        </button>
+      </div>
 
-      {role === "student" && (
-        <>
-          <button onClick={() => navigate("/home")}>
-            Dashboard
-          </button>
-          <button onClick={() => navigate("/home#post")}>
-            Post Lost Item
-          </button>
-          <button onClick={() => navigate("/home#found")}>
-            View Found Items
-          </button>
-        </>
-      )}
+      <div className={`sidebar ${isOpen ? "active" : ""}`}>
+        <h4 className="sidebar-title">
+          {role === "admin" ? "Admin Panel" : "Student Panel"}
+        </h4>
 
-      {role === "admin" && (
-        <>
-          <button onClick={() => navigate("/admin")}>
-            Dashboard
-          </button>
-          <button onClick={() => navigate("/admin#claims")}>
-            View Claims
-          </button>
-        </>
-      )}
+        {role === "student" && (
+          <>
+            <button onClick={() => handleNavigate("/home")}>
+              Dashboard
+            </button>
+            <button onClick={() => handleNavigate("/student/post-lost")}>
+              Post Lost Item
+            </button>
+            <button onClick={() => handleNavigate("/student/found-items")}>
+              View Found Items
+            </button>
+          </>
+        )}
 
-      <button className="logout-btn" onClick={handleLogout}>
-        Logout
-      </button>
-    </div>
+        {role === "admin" && (
+          <>
+            <button onClick={() => handleNavigate("/admin")}>
+              Dashboard
+            </button>
+            <button onClick={() => handleNavigate("/admin/claims")}>
+              View Claims
+            </button>
+          </>
+        )}
+
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+    </>
   );
 }
 

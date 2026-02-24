@@ -24,11 +24,7 @@ const LostAndFound = () => {
             Post, search, and reconnect items with their rightful owners.
           </p>
 
-          <NavLink to="/home">
-            <button className="btn btn-light btn-lg px-4 py-2 fw-semibold shadow">
-              Get Started
-            </button>
-          </NavLink>
+          
           
           
         </div>
