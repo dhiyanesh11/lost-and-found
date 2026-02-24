@@ -322,11 +322,44 @@ app.get("/claims", auth, authorize(["admin"]), async (req, res) => {
       .populate("studentId")
       .populate("foundItemId");
 
-    res.json(claims);
+    // Attach lost post count for each student
+    const enhancedClaims = await Promise.all(
+      claims.map(async (claim) => {
+        const lostCount = await LostItem.countDocuments({
+          studentId: claim.studentId._id,
+        });
+
+        return {
+          ...claim.toObject(),
+          lostCount,
+        };
+      })
+    );
+
+    res.json(enhancedClaims);
+
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch claims" });
+    res.status(500).json({ message: "Failed to fetch claims" });
   }
 });
+app.get(
+  "/admin/students/:id/lost-items",
+  auth,
+  authorize(["admin"]),
+  async (req, res) => {
+    try {
+      const studentId = req.params.id;
+
+      const lostItems = await LostItem.find({ studentId })
+        .sort({ createdAt: -1 });
+
+      res.json(lostItems);
+
+    } catch (err) {
+      res.status(500).json({ message: "Failed to fetch history" });
+    }
+  }
+);
 
 // Student raises complaint
 app.post("/complaints", auth, authorize(["student"]), async (req, res) => {

@@ -4,6 +4,7 @@ import Home from "./Components/Home";
 import Login from "./Login";
 import Signup from "./Signup";
 import Admin from "./Admin";
+import StudentHistory from "./StudentHistory";
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -18,6 +19,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin" element={<Admin />} />
+        <Route
+  path="/admin/student/:id/history"
+  element={<StudentHistory />}
+/>
 
         <Route
           path="/home"

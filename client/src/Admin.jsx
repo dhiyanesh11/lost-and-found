@@ -2,6 +2,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "./Components/Sidebar";
 
 function Admin() {
   const navigate = useNavigate();
@@ -97,7 +98,10 @@ function Admin() {
   };
 
   return (
-    <div>
+  <div style={{ display: "flex" }}>
+    <Sidebar role="admin" />
+
+    <div style={{ marginLeft: "240px", width: "100%" }}>
       {/* HEADER */}
       <section
         className="text-white text-center py-5 position-relative"
@@ -305,6 +309,16 @@ function Admin() {
                 <p className="small">
                   Status: {claim.status}
                 </p>
+                <div
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    navigate(`/admin/student/${claim.studentId._id}/history`)
+                  }
+                >
+                  <p className="text-primary fw-bold">
+                    Lost Posts: {claim.lostCount} (Click to View)
+                  </p>
+                </div>
 
                 {claim.status === "pending" && (
                   <>
@@ -328,6 +342,7 @@ function Admin() {
         </div>
       </div>
 
+    </div>
     </div>
   );
 }

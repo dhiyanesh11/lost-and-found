@@ -2,6 +2,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
 function Home() {
   const navigate = useNavigate();
@@ -111,7 +112,10 @@ function Home() {
   };
 
   return (
-    <div>
+  <div style={{ display: "flex" }}>
+    <Sidebar role="student" />
+
+    <div style={{ marginLeft: "240px", width: "100%" }}>
       {/* HEADER */}
       <section
         className="text-white text-center py-5 position-relative"
@@ -263,15 +267,7 @@ function Home() {
           {data.map((item, index) => (
             <div className="col-md-4" key={index}>
               <div className="p-4 rounded-4 shadow-sm bg-light h-100 hover-card">
-                {item.status === "available" && (
-                  <button
-                    className="btn btn-success w-100 mt-2"
-                    onClick={() => handleClaim(item._id)}
-                  >
-                    Claim This Item
-                  </button>
-                )}
-
+                
                 {item.imageUrl && (
                   <img
                     src={item.imageUrl}
@@ -285,17 +281,27 @@ function Home() {
                     }}
                   />
                 )}
+                
 
                 <h5 className="fw-bold">{item.title}</h5>
                 <p className="text-muted mb-1">📍 {item.location}</p>
                 <p className="small">{item.description}</p>
+
+                {item.status === "available" && (
+                  <button
+                    className="btn btn-success w-100 mt-2"
+                    onClick={() => handleClaim(item._id)}
+                  >
+                    Claim This Item
+                  </button>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-    </div>
+    </div> </div>
   );
 }
 
