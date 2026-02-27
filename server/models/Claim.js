@@ -22,10 +22,10 @@ const claimSchema = new mongoose.Schema(
       default: "",
     },
     reviewedBy: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User"
-},
-reviewedAt: Date
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
+    reviewedAt: Date
   },
   { timestamps: true }
 );

@@ -17,6 +17,7 @@ const User = require("./models/User");
 const LostItem = require("./models/LostItem");
 const FoundItem = require("./models/FoundItem");
 
+const axios = require("axios");
 
 const app = express();
 
@@ -237,14 +238,45 @@ app.post(
       const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileName}`;
 
       const newItem = await FoundItem.create({
-  title: req.body.title,
-  description: req.body.description,
-  location: req.body.location,
-  imageUrl,
-  postedBy: req.user.id,
-});
+        title: req.body.title,
+        description: req.body.description,
+        location: req.body.location,
+        imageUrl,
+        postedBy: req.user.id,
+      });
 
-      res.json(newItem);
+      // 1️⃣ Fetch all open lost items
+      const lostItems = await LostItem.find({ status: "open" });
+
+      // 2️⃣ Call AI service
+      const aiResponse = await axios.post("http://localhost:8000/match", {
+        found_item: {
+          id: newItem._id,
+          title: newItem.title,
+          description: newItem.description,
+          location: newItem.location,
+        },
+        lost_items: lostItems.map(item => ({
+          id: item._id,
+          title: item.title,
+          description: item.description,
+          location: item.location,
+        })),
+        threshold: 0.6
+      });
+
+      // 3️⃣ Get matches
+      const matches = aiResponse.data.matches;
+
+      console.log("AI Matches:", matches);
+
+      // (Later we’ll convert this into notifications)
+
+      // Send response including matches
+      res.json({
+        foundItem: newItem,
+        matches
+      });
 
     } catch (error) {
       console.error(error);

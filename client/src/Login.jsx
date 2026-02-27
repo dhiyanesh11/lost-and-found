@@ -28,11 +28,11 @@ function Login() {
         const decoded = jwtDecode(token);
 
         if (decoded.role === "admin") {
-  navigate("/admin/dashboard");
-} else {
-  navigate("/student/dashboard");
-}
-        
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/student/dashboard");
+        }
+
       })
       .catch((err) => {
         alert(err.response?.data?.message || "Login failed");

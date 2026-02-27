@@ -28,11 +28,7 @@ const foundItemSchema = new mongoose.Schema(
       enum: ["available", "closed"],
       default: "available",
     },
-    status: {
-      type: String,
-      enum: ["available", "closed"],
-      default: "available",
-    },
+    
   },
   { timestamps: true }
 );
