@@ -14,6 +14,7 @@ import Claims from "./Admin/Claims";
 import StudentHistory from "./Admin/StudentHistory";
 
 /* STUDENT */
+import Notifications from "./Student/Notifications";
 import StudentDashboard from "./Student/StudentDashboard";
 import PostLost from "./Student/PostLost";
 import FoundItems from "./Student/FoundItems";
@@ -134,6 +135,10 @@ function App() {
               <StudentHistory />
             </ProtectedRoute>
           }
+        />
+        <Route
+          path="/student/notifications"
+          element={<Notifications />}
         />
 
         {/* ================= FALLBACK ================= */}

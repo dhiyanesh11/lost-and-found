@@ -1,26 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
 
 function MyClaims() {
   const [claims, setClaims] = useState([]);
+
   const token = localStorage.getItem("token");
 
-  const fetchClaims = async () => {
-    const res = await axios.get(
-      "http://localhost:3001/claims/me",
-      {
-        headers: { Authorization: `Bearer ${token}` }
-      }
-    );
-    setClaims(res.data);
-  };
+  // Fetch claims
+  const fetchClaims = useCallback(async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:3001/claims/me",
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
+      setClaims(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  }, [token]);
+
+  // Run on page load
   useEffect(() => {
     fetchClaims();
-  }, []);
+  }, [fetchClaims]);
 
+  // Cancel claim
   const cancelClaim = async (id) => {
     try {
       await axios.delete(
@@ -30,8 +39,10 @@ function MyClaims() {
         }
       );
 
-      fetchClaims();
+      fetchClaims(); // refresh list
+
       alert("Claim cancelled");
+
     } catch (err) {
       alert(err.response?.data?.message || "Cannot cancel");
     }
@@ -47,6 +58,7 @@ function MyClaims() {
         <div className="row g-4">
           {claims.map((claim) => (
             <div key={claim._id} className="col-lg-4 col-md-6 col-12">
+
               <div className="card p-3 shadow-sm rounded-4 h-100">
 
                 {/* IMAGE */}
@@ -89,7 +101,7 @@ function MyClaims() {
 
                 <hr />
 
-                {/* STATUS BADGE */}
+                {/* STATUS */}
                 <div className="mb-3">
                   <span
                     className={`badge ${
@@ -115,9 +127,11 @@ function MyClaims() {
                 )}
 
               </div>
+
             </div>
           ))}
         </div>
+
       </div>
     </>
   );

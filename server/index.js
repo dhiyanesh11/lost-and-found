@@ -9,6 +9,7 @@ const multer = require("multer");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 
+const Notification = require("./models/Notification");
 const authorize = require("./middleware/authorize");
 const auth = require("./middleware/auth");
 const s3 = require("./config/s3");
@@ -268,9 +269,23 @@ app.post(
       // 3️⃣ Get matches
       const matches = aiResponse.data.matches;
 
-      console.log("AI Matches:", matches);
+      for (const match of matches) {
+        const lostItem = await LostItem.findById(match.lostItemId);
 
-      // (Later we’ll convert this into notifications)
+        if (lostItem) {
+          await Notification.create({
+            studentId: lostItem.studentId,
+            lostItemId: lostItem._id,
+            foundItemId: newItem._id,
+            similarity: match.similarity,
+            message: `Possible match found (${Math.round(
+              match.similarity * 100
+            )}% match) for your lost item "${lostItem.title}".`,
+          });
+        }
+      }
+
+
 
       // Send response including matches
       res.json({
@@ -284,7 +299,25 @@ app.post(
     }
   }
 );
+// Student fetch notifications
+app.get("/notifications", auth, authorize(["student"]), async (req, res) => {
+  const notifications = await Notification.find({
+    studentId: req.user.id,
+  })
+    .sort({ createdAt: -1 })
+    .populate("foundItemId");
 
+  res.json(notifications);
+});
+
+// Mark notification as read
+app.patch("/notifications/:id/read", auth, authorize(["student"]), async (req, res) => {
+  await Notification.findByIdAndUpdate(req.params.id, {
+    read: true,
+  });
+
+  res.json({ message: "Marked as read" });
+});
 app.patch("/claims/:id", auth, authorize(["admin"]), async (req, res) => {
   try {
     const { status, adminNote } = req.body;

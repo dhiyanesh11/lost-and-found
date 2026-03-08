@@ -9,26 +9,26 @@ function FoundItems() {
 
   const token = localStorage.getItem("token");
 
-  // Fetch found items
-  const fetchItems = async () => {
-    const res = await axios.get("http://localhost:3001/founditems", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setItems(res.data);
-  };
-
-  // Fetch my claims
-  const fetchMyClaims = async () => {
-    const res = await axios.get("http://localhost:3001/claims/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setMyClaims(res.data);
-  };
-
   useEffect(() => {
+
+    const fetchItems = async () => {
+      const res = await axios.get("http://localhost:3001/founditems", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setItems(res.data);
+    };
+
+    const fetchMyClaims = async () => {
+      const res = await axios.get("http://localhost:3001/claims/me", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyClaims(res.data);
+    };
+
     fetchItems();
     fetchMyClaims();
-  }, []);
+
+  }, [token]);
 
   const claimItem = async (id) => {
     try {
@@ -38,14 +38,18 @@ function FoundItems() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      fetchMyClaims(); // refresh claim state
+      // refresh claims
+      const res = await axios.get("http://localhost:3001/claims/me", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setMyClaims(res.data);
+
       alert("Claim submitted!");
     } catch (err) {
       alert(err.response?.data?.message || "Already claimed");
     }
   };
 
-  // Helper: check if current user already claimed
   const isClaimed = (itemId) => {
     return myClaims.some(
       (claim) => claim.foundItemId?._id === itemId
@@ -67,7 +71,6 @@ function FoundItems() {
               <div key={item._id} className="col-lg-4 col-md-6 col-12">
                 <div className="card p-3 shadow-sm rounded-4 h-100">
 
-                  {/* IMAGE */}
                   {item.imageUrl && (
                     <div
                       style={{
@@ -94,17 +97,11 @@ function FoundItems() {
                   )}
 
                   <h5 className="fw-bold">{item.title}</h5>
-                  <p className="small text-muted">
-                    {item.description}
-                  </p>
+                  <p className="small text-muted">{item.description}</p>
                   <p className="small">📍 {item.location}</p>
 
-                  {/* CLAIM BUTTON */}
                   {claimed ? (
-                    <button
-                      className="btn btn-secondary w-100 mt-2"
-                      disabled
-                    >
+                    <button className="btn btn-secondary w-100 mt-2" disabled>
                       Claimed
                     </button>
                   ) : (
