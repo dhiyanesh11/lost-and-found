@@ -1,21 +1,14 @@
 .dashboard-content {
-  margin-left: 240px;
+  margin-left: 260px;
   padding: 30px;
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background: transparent;
+  color: rgba(12,18,38,0.92);
 }
 
 @media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-    transition: 0.3s ease;
-  }
-
-  .sidebar.active {
-    transform: translateX(0);
-  }
-
   .dashboard-content {
     margin-left: 0;
+    padding: 22px 16px;
   }
 }

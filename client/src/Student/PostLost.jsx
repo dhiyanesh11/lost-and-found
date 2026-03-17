@@ -65,8 +65,15 @@ function PostLost() {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
       });
-
+      
       alert("Lost item posted!");
+      
+      // ✅ CLEAR EVERYTHING
+      setForm({
+        name: "",
+        place: "",
+        description: ""
+      });
       setImage(null);
     } catch {
       alert("Failed to post lost item");
@@ -88,31 +95,34 @@ function PostLost() {
             className="card p-4 shadow-sm rounded-4"
           >
             <input
-              type="text"
-              name="name"
-              placeholder="Item Title"
-              className="form-control mb-3"
-              onChange={handleChange}
-              required
-            />
+  type="text"
+  name="name"
+  value={form.name}
+  placeholder="Item Title"
+  className="form-control mb-3"
+  onChange={handleChange}
+  required
+/>
 
-            <input
-              type="text"
-              name="place"
-              placeholder="Location Lost"
-              className="form-control mb-3"
-              onChange={handleChange}
-              required
-            />
+<input
+  type="text"
+  name="place"
+  value={form.place}
+  placeholder="Location Lost"
+  className="form-control mb-3"
+  onChange={handleChange}
+  required
+/>
 
-            <textarea
-              name="description"
-              placeholder="Description"
-              className="form-control mb-3"
-              rows="4"
-              onChange={handleChange}
-              required
-            />
+<textarea
+  name="description"
+  value={form.description}
+  placeholder="Description"
+  className="form-control mb-3"
+  rows="4"
+  onChange={handleChange}
+  required
+/>
 
             {/* DRAG & DROP AREA */}
             <div

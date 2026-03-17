@@ -138,7 +138,11 @@ function App() {
         />
         <Route
           path="/student/notifications"
-          element={<Notifications />}
+          element={
+            <ProtectedRoute role="student">
+              <Notifications />
+            </ProtectedRoute>
+          }
         />
 
         {/* ================= FALLBACK ================= */}

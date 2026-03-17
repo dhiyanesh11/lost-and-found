@@ -65,6 +65,7 @@ function Sidebar({ role }) {
         <button
           className="hamburger-btn"
           onClick={() => setIsOpen(!isOpen)}
+          aria-label={isOpen ? "Close navigation" : "Open navigation"}
         >
           {isOpen ? "✖" : "☰"}
         </button>
@@ -72,38 +73,42 @@ function Sidebar({ role }) {
 
       {isOpen && <div className="sidebar-overlay"></div>}
 
-      <div className={`sidebar ${isOpen ? "active" : ""}`}>
-        <h4 className="sidebar-title">
-          {role === "admin" ? "Admin Panel" : "Student Panel"}
-        </h4>
+      <aside className={`sidebar ${isOpen ? "active" : ""}`}>
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <div className="sidebar-logo" aria-hidden="true" />
+            <div className="sidebar-brandText">
+              <div className="sidebar-appName">Lost & Found</div>
+              <div className="sidebar-role">
+                {role === "admin" ? "Admin Console" : "Student Dashboard"}
+              </div>
+            </div>
+          </div>
+        </div>
 
         {role === "student" && (
           <>
             <NavLink to="/student/dashboard" className={linkClass}>
-              Dashboard
+              <span className="sidebar-linkText">Dashboard</span>
             </NavLink>
 
             <NavLink to="/student/post-lost" className={linkClass}>
-              Post Lost Item
+              <span className="sidebar-linkText">Post Lost Item</span>
             </NavLink>
 
             <NavLink to="/student/found-items" className={linkClass}>
-              View Found Items
+              <span className="sidebar-linkText">View Found Items</span>
             </NavLink>
 
             <NavLink to="/student/my-claims" className={linkClass}>
-              My Claims
+              <span className="sidebar-linkText">My Claims</span>
             </NavLink>
             
 
             {/* 🔔 Notifications */}
             <NavLink to="/student/notifications" className={linkClass}>
-              Notifications
-              {unreadCount > 0 && (
-                <span className="badge bg-danger ms-2">
-                  {unreadCount}
-                </span>
-              )}
+              <span className="sidebar-linkText">Notifications</span>
+              {unreadCount > 0 && <span className="sidebar-badge">{unreadCount}</span>}
             </NavLink>
           </>
         )}
@@ -111,27 +116,29 @@ function Sidebar({ role }) {
         {role === "admin" && (
           <>
             <NavLink to="/admin/dashboard" className={linkClass}>
-              Dashboard
+              <span className="sidebar-linkText">Dashboard</span>
             </NavLink>
 
             <NavLink to="/admin/post-found" className={linkClass}>
-              Post Found Item
+              <span className="sidebar-linkText">Post Found Item</span>
             </NavLink>
 
             <NavLink to="/admin/lost-items" className={linkClass}>
-              View Lost Items
+              <span className="sidebar-linkText">View Lost Items</span>
             </NavLink>
 
             <NavLink to="/admin/claims" className={linkClass}>
-              View Claims
+              <span className="sidebar-linkText">View Claims</span>
             </NavLink>
           </>
         )}
 
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+        <div className="sidebar-footer">
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
+      </aside>
     </>
   );
 }

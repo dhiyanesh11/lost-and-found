@@ -119,13 +119,13 @@ function Notifications() {
             {selectedItem && (
               <>
                 {selectedItem?.imageUrl && (
-  <img
-    src={selectedItem.imageUrl}
-    alt="item"
-    className="img-fluid rounded mb-3"
-    style={{ maxHeight: "250px", objectFit: "cover" }}
-  />
-)}
+                  <img
+                    src={selectedItem.imageUrl}
+                    alt="item"
+                    className="img-fluid rounded mb-3"
+                    style={{ maxHeight: "250px", objectFit: "cover" }}
+                  />
+                )}
 
                 <p><b>Title:</b> {selectedItem.title}</p>
                 <p><b>Description:</b> {selectedItem.description}</p>
