@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Modal, Button } from "react-bootstrap";
 import Sidebar from "../Components/Sidebar";
+import API_URL from "../config";
 
 function Notifications() {
 
@@ -18,7 +19,7 @@ function Notifications() {
       try {
 
         const res = await axios.get(
-          "http://localhost:3001/notifications",
+          `${API_URL}/notifications`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -48,7 +49,7 @@ function Notifications() {
     try {
 
       await axios.post(
-        "http://localhost:3001/claim-item",
+        `${API_URL}/claim-item`,
         { itemId: selectedItem._id },
         {
           headers: { Authorization: `Bearer ${token}` },

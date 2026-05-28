@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Sidebar.css";
+import API_URL from "../config";
 
 function Sidebar({ role }) {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ function Sidebar({ role }) {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const res = await axios.get("http://localhost:3001/notifications", {
+        const res = await axios.get(`${API_URL}/notifications`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

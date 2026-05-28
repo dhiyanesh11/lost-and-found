@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import API_URL from "../config";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
 import "./AdminDashboard.css";
@@ -22,9 +23,9 @@ function AdminDashboard() {
         const headers = { Authorization: `Bearer ${token}` };
 
         const [lostRes, foundRes, claimsRes] = await Promise.all([
-          axios.get("http://localhost:3001/lostitems", { headers }),
-          axios.get("http://localhost:3001/founditems", { headers }),
-          axios.get("http://localhost:3001/claims", { headers }),
+          axios.get(`${API_URL}/lostitems`, { headers }),
+          axios.get(`${API_URL}/founditems`, { headers }),
+          axios.get(`${API_URL}/claims`, { headers }),
         ]);
 
         if (!mounted) return;

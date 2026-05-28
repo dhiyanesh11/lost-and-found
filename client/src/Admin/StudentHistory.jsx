@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Components/Sidebar";
+import API_URL from "../config";
 
 function StudentHistory() {
   const { id } = useParams();
@@ -13,7 +14,7 @@ function StudentHistory() {
     const fetchHistory = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3001/admin/students/${id}/lost-items`,
+          `${API_URL}/admin/students/${id}/lost-items`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
+import API_URL from "../config";
 
 function PostFound() {
     const [form, setForm] = useState({
@@ -25,7 +26,7 @@ function PostFound() {
         formData.append("image", image);
 
         try {
-            await axios.post("http://localhost:3001/founditems", formData, {
+            await axios.post(`${API_URL}/founditems`, formData, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }

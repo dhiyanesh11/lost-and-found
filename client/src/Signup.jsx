@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./Login.css";
 import "./Signup.css";
+import API_URL from "./config";
 
 function Signup() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ function Signup() {
     setError("");
 
     try {
-      await axios.post("http://localhost:3001/signup", form);
+      await axios.post(`${API_URL}/signup`, form);
       setSuccess(true);
       setTimeout(() => navigate("/login"), 1400);
     } catch (err) {

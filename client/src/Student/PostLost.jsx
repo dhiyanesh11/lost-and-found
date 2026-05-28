@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
+import API_URL from "../config";
 
 function PostLost() {
   const [form, setForm] = useState({
@@ -60,7 +61,7 @@ function PostLost() {
     formData.append("image", image);
 
     try {
-      await axios.post("http://localhost:3001/lostitems", formData, {
+      await axios.post(`${API_URL}/lostitems`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }

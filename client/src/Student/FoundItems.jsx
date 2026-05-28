@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
+import API_URL from "../config";
 
 function FoundItems() {
   const [items, setItems] = useState([]);
@@ -12,14 +13,14 @@ function FoundItems() {
   useEffect(() => {
 
     const fetchItems = async () => {
-      const res = await axios.get("http://localhost:3001/founditems", {
+      const res = await axios.get(`${API_URL}/founditems`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setItems(res.data);
     };
 
     const fetchMyClaims = async () => {
-      const res = await axios.get("http://localhost:3001/claims/me", {
+      const res = await axios.get(`${API_URL}/claims/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMyClaims(res.data);
@@ -33,13 +34,13 @@ function FoundItems() {
   const claimItem = async (id) => {
     try {
       await axios.post(
-        "http://localhost:3001/claims",
+        `${API_URL}/claims`,
         { foundItemId: id },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // refresh claims
-      const res = await axios.get("http://localhost:3001/claims/me", {
+      const res = await axios.get(`${API_URL}/claims/me`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMyClaims(res.data);

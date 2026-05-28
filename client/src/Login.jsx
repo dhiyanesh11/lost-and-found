@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import "./Login.css";
+import API_URL from "./config";
 
 function Login() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:3001/login", form);
+      const res = await axios.post(`${API_URL}/login`, form);
       const token = res.data.token;
       localStorage.setItem("token", token);
 
@@ -199,10 +200,10 @@ function Login() {
                     role="status"
                     aria-hidden="true"
                   />
-                  Signing in...
+                  Loggning in...
                 </>
               ) : (
-                "Sign In"
+                "Log In"
               )}
             </button>
           </form>

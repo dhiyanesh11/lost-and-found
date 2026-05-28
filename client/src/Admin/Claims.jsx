@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Components/Sidebar";
+import API_URL from "../config";
 
 function Claims() {
   const [claims, setClaims] = useState([]);
@@ -9,7 +10,7 @@ function Claims() {
 
   const fetchClaims = async () => {
     try {
-      const res = await axios.get("http://localhost:3001/claims", {
+      const res = await axios.get(`${API_URL}/claims`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`
         }
@@ -35,7 +36,7 @@ function Claims() {
   const updateClaim = async (id, status) => {
     try {
       await axios.patch(
-        `http://localhost:3001/claims/${id}`,
+        `${API_URL}/claims/${id}`,
         { status },
         {
           headers: {

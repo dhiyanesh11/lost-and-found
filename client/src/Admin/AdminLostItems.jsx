@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
+import API_URL from "../config";
 
 function AdminLostItems() {
     const [items, setItems] = useState([]);
 
     useEffect(() => {
         axios
-            .get("http://localhost:3001/lostitems", {
+            .get(`${API_URL}/lostitems`, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("token")}`
                 }

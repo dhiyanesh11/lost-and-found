@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Sidebar from "../Components/Sidebar";
 import "../Components/dashboard.css";
+import API_URL from "../config";
 
 function MyClaims() {
   const [claims, setClaims] = useState([]);
@@ -12,7 +13,7 @@ function MyClaims() {
   const fetchClaims = useCallback(async () => {
     try {
       const res = await axios.get(
-        "http://localhost:3001/claims/me",
+        `${API_URL}/claims/me`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -33,7 +34,7 @@ function MyClaims() {
   const cancelClaim = async (id) => {
     try {
       await axios.delete(
-        `http://localhost:3001/claims/${id}`,
+        `${API_URL}/claims/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
