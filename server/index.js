@@ -250,7 +250,7 @@ app.post(
       const lostItems = await LostItem.find({ status: "open" });
 
       // 2️⃣ Call AI service
-      const aiResponse = await axios.post("http://localhost:8000/match", {
+      const aiResponse = await axios.post("https://lost-found-ai-matching-service.onrender.com/match", {
         found_item: {
           id: newItem._id,
           title: newItem.title,
